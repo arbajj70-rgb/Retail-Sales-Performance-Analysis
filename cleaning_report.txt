@@ -1,0 +1,13 @@
+DATA CLEANING REPORT
+====================
+customers : 30 rows
+products  : 25 rows
+orders    : 1185 rows (cleaned)
+
+Issues fixed:
+  • Duplicate rows removed
+  • Date formats standardised to YYYY-MM-DD
+  • Null quantities dropped
+  • Invalid quantities (<=0) dropped
+  • Logical duplicate orders removed
+  • Text fields stripped and title-cased

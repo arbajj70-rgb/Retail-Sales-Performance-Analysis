@@ -1,0 +1,272 @@
+
+============================================================
+  1a. NULL check across all critical columns
+============================================================
+  customers_name_nulls | customers_region_nulls | products_price_nulls | orders_date_nulls | orders_qty_nulls
+  0 | 0 | 0 | 0 | 0
+  (1 rows)
+
+============================================================
+  1b. Duplicate orders (same customer + product + date)
+============================================================
+  customer_id | product_id | order_date | duplicate_count
+  (0 rows)
+
+============================================================
+  1c. Orphan check: orders referencing non-existent customers
+============================================================
+  order_id | customer_id
+  (0 rows)
+
+============================================================
+  1d. Orphan check: orders referencing non-existent products
+============================================================
+  order_id | product_id
+  (0 rows)
+
+============================================================
+  1e. Invalid date format check (should return 0 rows)
+============================================================
+  order_id | order_date
+  (0 rows)
+
+============================================================
+  1f. Out-of-range quantity check
+============================================================
+  order_id | quantity
+  (0 rows)
+
+============================================================
+  2a. Total revenue
+============================================================
+  total_revenue
+  156154.02
+  (1 rows)
+
+============================================================
+  2b. Total orders, total units sold, average order value
+============================================================
+  total_orders | total_units_sold | avg_line_value | total_revenue
+  1185 | 2516 | 131.78 | 156154.02
+  (1 rows)
+
+============================================================
+  3a. Revenue by category (fixed: category in both SELECT and GROUP BY)
+============================================================
+  category | revenue | units_sold | num_orders
+  Electronics | 44715.29 | 611 | 292
+  Home | 42186.98 | 567 | 268
+  Sports | 32595.13 | 487 | 233
+  Clothing | 27278.26 | 656 | 304
+  Accessories | 9378.36 | 195 | 88
+  (5 rows)
+
+============================================================
+  3b. Top 10 best-selling products by revenue (fixed GROUP BY)
+============================================================
+  product_id | product_name | category | total_units | total_revenue
+  7 | Smartwatch | Electronics | 81 | 16119.0
+  19 | Cookware Set | Home | 80 | 12720.0
+  21 | Running Shoes | Sports | 137 | 12328.63
+  6 | Vacuum Cleaner | Home | 88 | 11352.0
+  20 | Hiking Boots | Sports | 89 | 10679.11
+  15 | Sneakers | Clothing | 117 | 8773.83
+  1 | Wireless Headphones | Electronics | 87 | 8699.13
+  5 | Coffee Maker | Home | 97 | 7663.0
+  8 | Jacket | Clothing | 82 | 7339.0
+  25 | Dumbbells Set | Sports | 91 | 6369.09
+  (10 rows)
+
+============================================================
+  3c. Product revenue rank within each category (window function)
+============================================================
+  category | product_name | revenue | rank_in_category
+  Accessories | Sunglasses | 4819.5 | 1
+  Accessories | Backpack | 4558.86 | 2
+  Clothing | Sneakers | 8773.83 | 1
+  Clothing | Jacket | 7339.0 | 2
+  Clothing | Jeans | 5648.87 | 3
+  Clothing | T-Shirt | 2158.92 | 4
+  Clothing | Cap | 1999.0 | 5
+  Clothing | Socks 3 Pack | 1358.64 | 6
+  Electronics | Smartwatch | 16119.0 | 1
+  Electronics | Wireless Headphones | 8699.13 | 2
+  Electronics | Gaming Mouse | 5459.09 | 3
+  Electronics | Bluetooth Speaker | 5395.5 | 4
+  Electronics | Laptop Stand | 5263.83 | 5
+  Electronics | Wireless Charger | 3778.74 | 6
+  Home | Cookware Set | 12720.0 | 1
+  Home | Vacuum Cleaner | 11352.0 | 2
+  Home | Coffee Maker | 7663.0 | 3
+  Home | Blender | 3919.02 | 4
+  Home | Desk Lamp | 3628.79 | 5
+  Home | Throw Blanket | 2904.17 | 6
+  Sports | Running Shoes | 12328.63 | 1
+  Sports | Hiking Boots | 10679.11 | 2
+  Sports | Dumbbells Set | 6369.09 | 3
+  Sports | Yoga Mat | 1674.33 | 4
+  Sports | Water Bottle | 1543.97 | 5
+  (25 rows)
+
+============================================================
+  4a. Revenue by region (fixed GROUP BY)
+============================================================
+  region | revenue | unique_customers | num_orders
+  West | 54240.06 | 11 | 419
+  South | 48928.43 | 9 | 379
+  Midwest | 27762.21 | 5 | 192
+  East | 25223.32 | 5 | 195
+  (4 rows)
+
+============================================================
+  4b. Best product-region combination
+============================================================
+  product_name | region | revenue
+  Running Shoes | South | 6209.31
+  Smartwatch | West | 5771.0
+  Vacuum Cleaner | West | 5547.0
+  Smartwatch | Midwest | 4577.0
+  Cookware Set | West | 4452.0
+  (5 rows)
+
+============================================================
+  5a. Monthly revenue trend (strftime instead of SUBSTR)
+============================================================
+  month | revenue | num_orders | units_sold
+  2025-10 | 17127.56 | 129 | 276
+  2025-11 | 21900.77 | 162 | 347
+  2025-12 | 16770.16 | 120 | 251
+  2026-01 | 19356.95 | 138 | 280
+  2026-02 | 17762.7 | 147 | 310
+  2026-03 | 18089.48 | 139 | 308
+  2026-04 | 16571.92 | 127 | 277
+  2026-05 | 20913.09 | 157 | 326
+  2026-06 | 7661.39 | 66 | 141
+  (9 rows)
+
+============================================================
+  5b. Running cumulative revenue by month (window function)
+============================================================
+  month | revenue | cumulative_revenue
+  2025-10 | 17127.56 | 17127.56
+  2025-11 | 21900.77 | 39028.33
+  2025-12 | 16770.16 | 55798.49
+  2026-01 | 19356.95 | 75155.44
+  2026-02 | 17762.7 | 92918.14
+  2026-03 | 18089.48 | 111007.62
+  2026-04 | 16571.92 | 127579.54
+  2026-05 | 20913.09 | 148492.63
+  2026-06 | 7661.39 | 156154.02
+  (9 rows)
+
+============================================================
+  5c. Day-of-week revenue pattern
+============================================================
+  day_of_week | revenue | num_orders
+  Sunday | 37509.03 | 278
+  Monday | 18038.99 | 137
+  Tuesday | 15604.73 | 124
+  Wednesday | 17445.86 | 128
+  Thursday | 14777.14 | 122
+  Friday | 16727.55 | 124
+  Saturday | 36050.72 | 272
+  (7 rows)
+
+============================================================
+  6a. Average order value per customer (fixed GROUP BY)
+============================================================
+  customer_id | customer_name | region | total_orders | total_spend | avg_order_value
+  15 | Omar Hassan | Midwest | 42 | 7720.41 | 183.82
+  8 | Hiro Tanaka | East | 50 | 6933.16 | 138.66
+  12 | Leo Nguyen | South | 45 | 6538.25 | 145.29
+  5 | Eve Martin | South | 42 | 6312.85 | 150.31
+  21 | Uma Patel | West | 46 | 6088.23 | 132.35
+  27 | Aaron Brooks | West | 49 | 6031.19 | 123.09
+  17 | Quincy Park | South | 43 | 5991.74 | 139.34
+  19 | Samir Khan | Midwest | 42 | 5772.82 | 137.45
+  18 | Rosa Jimenez | West | 40 | 5645.86 | 141.15
+  23 | Wendy Cho | Midwest | 41 | 5607.23 | 136.76
+  28 | Bella Torres | South | 39 | 5430.81 | 139.25
+  16 | Priya Singh | West | 45 | 5423.75 | 120.53
+  11 | Karen Patel | South | 42 | 5353.27 | 127.46
+  24 | Xander Reed | East | 41 | 5283.82 | 128.87
+  4 | Diana Lee | East | 43 | 5238.39 | 121.82
+  22 | Victor Cruz | South | 49 | 5108.19 | 104.25
+  14 | Nina Rossi | West | 35 | 5049.58 | 144.27
+  26 | Zoe Williams | South | 42 | 5020.33 | 119.53
+  25 | Yuki Tanaka | West | 32 | 4936.52 | 154.27
+  7 | Grace Park | West | 38 | 4875.79 | 128.31
+  10 | Jack Liu | West | 41 | 4684.41 | 114.25
+  20 | Tina Adams | South | 41 | 4673.52 | 113.99
+  6 | Frank Zhou | Midwest | 38 | 4593.18 | 120.87
+  3 | Carlos Diaz | South | 36 | 4499.47 | 124.99
+  13 | Maya Green | East | 35 | 4309.44 | 123.13
+  1 | Alice Johnson | West | 30 | 4205.53 | 140.18
+  9 | Ingrid Berg | Midwest | 29 | 4068.57 | 140.3
+  2 | Bob Smith | West | 28 | 3833.12 | 136.9
+  29 | Caleb Morris | West | 35 | 3466.08 | 99.03
+  30 | Daisy Wang | East | 26 | 3458.51 | 133.02
+  (30 rows)
+
+============================================================
+  6b. Top 10 customers by revenue with contribution % (fixed GROUP BY)
+============================================================
+  customer_id | name | region | revenue | pct_of_total | revenue_rank
+  15 | Omar Hassan | Midwest | 7720.41 | 4.94 | 1
+  8 | Hiro Tanaka | East | 6933.16 | 4.44 | 2
+  12 | Leo Nguyen | South | 6538.25 | 4.19 | 3
+  5 | Eve Martin | South | 6312.85 | 4.04 | 4
+  21 | Uma Patel | West | 6088.23 | 3.9 | 5
+  27 | Aaron Brooks | West | 6031.19 | 3.86 | 6
+  17 | Quincy Park | South | 5991.74 | 3.84 | 7
+  19 | Samir Khan | Midwest | 5772.82 | 3.7 | 8
+  18 | Rosa Jimenez | West | 5645.86 | 3.62 | 9
+  23 | Wendy Cho | Midwest | 5607.23 | 3.59 | 10
+  (10 rows)
+
+============================================================
+  6c. Churned customers: no order in last 90 days (dynamic date)
+============================================================
+  customer_id | name | region | last_order_date | churn_reason
+  (0 rows)
+
+============================================================
+  6d. Repeat vs one-time buyers
+============================================================
+  purchase_segment | customer_count | pct
+  Loyal (5+ orders) | 30 | 100.0
+  (1 rows)
+
+============================================================
+  6e. Customer age group analysis
+============================================================
+  age_group | customers | revenue | avg_order_value
+  18-29 | 8 | 42785.68 | 133.29
+  30-39 | 13 | 65340.23 | 130.42
+  40-49 | 9 | 48028.11 | 132.31
+  (3 rows)
+
+============================================================
+  7a. Month-over-month revenue growth %
+============================================================
+  month | revenue | prev_month_revenue | mom_growth_pct
+  2025-10 | 17127.56 | NULL | NULL
+  2025-11 | 21900.77 | 17127.56 | 27.9
+  2025-12 | 16770.16 | 21900.77 | -23.4
+  2026-01 | 19356.95 | 16770.16 | 15.4
+  2026-02 | 17762.7 | 19356.95 | -8.2
+  2026-03 | 18089.48 | 17762.7 | 1.8
+  2026-04 | 16571.92 | 18089.48 | -8.4
+  2026-05 | 20913.09 | 16571.92 | 26.2
+  2026-06 | 7661.39 | 20913.09 | -63.4
+  (9 rows)
+
+============================================================
+  7b. Revenue contribution by region with % (window function)
+============================================================
+  region | revenue | pct_of_total
+  West | 54240.06 | 34.7
+  South | 48928.43 | 31.3
+  Midwest | 27762.21 | 17.8
+  East | 25223.32 | 16.2
+  (4 rows)
